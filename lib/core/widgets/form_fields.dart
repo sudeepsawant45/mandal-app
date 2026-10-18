@@ -49,6 +49,8 @@ class AmountFormField extends StatelessWidget {
 
 /// Date picker field backed by a [FormField] so it takes part in validation.
 class DateFormField extends FormField<DateTime> {
+  // `enabled` is used inside the builder closure, so it cannot become a super parameter.
+  // ignore: use_super_parameters
   DateFormField({
     super.key,
     required L10n l10n,

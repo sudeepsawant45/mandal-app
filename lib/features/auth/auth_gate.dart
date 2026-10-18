@@ -17,15 +17,12 @@ class AuthGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(sessionProvider);
-    switch (session.status) {
-      case SessionStatus.loading:
-        return const SplashScreen();
-      case SessionStatus.signedOut:
-        return const LoginScreen();
-      case SessionStatus.error:
-        return ProfileErrorScreen(error: session.error ?? 'error');
-      case SessionStatus.signedIn:
-        return const HomeShell();
+    final status = session.status;
+    if (status == SessionStatus.loading) return const SplashScreen();
+    if (status == SessionStatus.signedOut) return const LoginScreen();
+    if (status == SessionStatus.error) {
+      return ProfileErrorScreen(error: session.error ?? 'error');
     }
+    return const HomeShell(); // SessionStatus.signedIn
   }
 }

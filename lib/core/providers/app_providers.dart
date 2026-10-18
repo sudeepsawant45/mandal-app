@@ -30,7 +30,9 @@ import 'package:ganpati_mandal/services/visarjan_repository.dart';
 // to the Node.js API through [ApiClient] with the session's Bearer token.
 final tokenStoreProvider = Provider<TokenStore>((ref) => SecureTokenStore());
 
-final apiClientProvider = Provider<ApiClient>(
+// Explicit declared types: apiClientProvider and sessionProvider refer to each other (the 401 callback),
+// so Dart cannot infer either type and reports a top-level cycle without them.
+final Provider<ApiClient> apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(
     tokens: ref.watch(tokenStoreProvider),
     // The server rejected the session (expired, revoked, user deactivated).
@@ -38,7 +40,8 @@ final apiClientProvider = Provider<ApiClient>(
   ),
 );
 
-final sessionProvider = StateNotifierProvider<SessionController, SessionState>(
+final StateNotifierProvider<SessionController, SessionState> sessionProvider =
+    StateNotifierProvider<SessionController, SessionState>(
   (ref) => SessionController(ref.watch(apiClientProvider), ref.watch(tokenStoreProvider))..restore(),
 );
 

@@ -27,7 +27,7 @@ typedef ApiTransport = Future<ApiResponse> Function(
 /// shows in the UI is a hint; the server decides on every call.
 ///
 /// The base URL is not a secret; it is injected at build time:
-///   --dart-define=API_BASE_URL=https://<your-project>.vercel.app
+///   `--dart-define=API_BASE_URL=https://YOUR-PROJECT.vercel.app`
 class ApiClient {
   ApiClient({
     required TokenStore tokens,

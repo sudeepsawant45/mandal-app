@@ -5,7 +5,7 @@ import 'package:ganpati_mandal/services/api_client.dart';
 import 'package:ganpati_mandal/services/polling.dart';
 
 /// Shared plumbing for the small "master data" lists (households, visarjan
-/// groups, sponsors): a polled read of GET /api/<path> and POST/PUT writes.
+/// groups, sponsors): a polled read of `GET /api/PATH` and POST/PUT writes.
 /// Permissions are enforced by the server; the repositories only pre-check
 /// them so the UI can fail fast.
 abstract class MasterDataRepository<T> {
