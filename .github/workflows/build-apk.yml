@@ -1,30 +1,49 @@
-# Builds the Android APK in the cloud (no Flutter needed on your PC).
-# STATUS: WRITTEN BUT NEVER RUN. Action versions are the commonly used major tags; if a step
-# fails, open the run's log and send it to whoever maintains this project. 
-# Run it from GitHub: Actions tab -> "Build APK" -> Run workflow -> enter your https API domain.
+# Builds the Android APK in the cloud and publishes it as a GitHub Release.
+# STATUS: first successful run happened on the manual trigger; the release/auto-trigger parts are NEW and untested.
+#
+# Runs automatically when app code on master changes, or manually: Actions -> Build APK -> Run workflow.
+# API address: type it when running manually, or set it ONCE as a repository variable:
+#   repo Settings -> Secrets and variables -> Actions -> Variables -> New repository variable
+#   Name: API_BASE_URL   Value: https://your-project.vercel.app   (https, no trailing slash, no /api)
+# It is public information (compiled into the app), so a variable is fine - never put passwords here.
 name: Build APK
 on:
   workflow_dispatch:
     inputs:
       api_base_url:
-        description: "Production API URL, https only, no trailing slash, no /api (e.g. https://your-project.vercel.app)"
-        required: true
+        description: "Production API URL (https, no trailing slash, no /api). Leave empty to use the API_BASE_URL repository variable."
+        required: false
         type: string
+  push:
+    branches: [master]
+    paths:
+      - "lib/**"
+      - "assets/**"
+      - "pubspec.yaml"
+      - "scripts/bootstrap_android.sh"
+      - ".github/workflows/build-apk.yml"
 
 permissions:
-  contents: read
+  contents: write   # needed to create the release
+
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
 
 jobs:
   apk:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      API_BASE_URL: ${{ inputs.api_base_url || vars.API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Check the API URL
-        env:
-          API_BASE_URL: ${{ inputs.api_base_url }}
         run: |
+          if [ -z "$API_BASE_URL" ]; then
+            echo "No API address. Type it when running manually, or set the API_BASE_URL repository variable."; exit 1
+          fi
           case "$API_BASE_URL" in
             https://*) ;;
             *) echo "API URL must start with https://"; exit 1;;
@@ -58,8 +77,6 @@ jobs:
         run: flutter test
 
       - name: Build release APK
-        env:
-          API_BASE_URL: ${{ inputs.api_base_url }}
         run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
 
       - name: Fingerprint
@@ -70,3 +87,13 @@ jobs:
           name: ganpati-mandal-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 14
+
+      - name: Publish as a GitHub Release (stable download link)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.run_number }}" \
+            build/app/outputs/flutter-apk/app-release.apk \
+            --title "Build ${{ github.run_number }}" \
+            --notes "Automated build of commit ${GITHUB_SHA::7}." \
+            --latest
