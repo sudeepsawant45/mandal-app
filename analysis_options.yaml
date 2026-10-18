@@ -1,0 +1,9 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+
+# The default flutter_lints rule set is used as-is. Note that `flutter analyze`
+# treats info-level lints as failures by default; if you prefer to only fail on
+# warnings and errors run `flutter analyze --no-fatal-infos`.

@@ -1,0 +1,44 @@
+name: ganpati_mandal
+description: Finance manager for a small private neighbourhood Ganpati Mandal (Android).
+publish_to: "none"
+version: 1.0.0+1
+
+# SDK constraints (carried over from the earlier verified dependency set):
+#   Dart ^3.6.0, Flutter >=3.27.0
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.27.0"
+
+# ---------------------------------------------------------------------------
+# DEPENDENCY STATUS
+#   VERIFIED   = latest stable version confirmed on pub.dev during this session
+#   UNRESOLVED = could not be verified here (lookup was blocked / rejected);
+#                the constraint below is a best guess. Run `flutter pub get`
+#                and `flutter pub outdated` locally and adjust if it fails.
+# See README.md -> "Dependency status" for details.
+# ---------------------------------------------------------------------------
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # REMOVED on purpose: firebase_core, firebase_auth, cloud_firestore. The app no
+  # longer uses Firebase at all; Firestore is reached only by the Node.js backend.
+  flutter_secure_storage: ^9.2.4  # UNRESOLVED - session token in Android encrypted storage (minSdk 23)
+  flutter_riverpod: ^2.6.1    # UNRESOLVED - code is written against the 2.x API (StateProvider, valueOrNull)
+  pdf: ^3.13.1                # VERIFIED (3.13.1)
+  share_plus: ^11.0.0         # UNRESOLVED - code uses SharePlus.instance.share(ShareParams(...)) (API since 11.0)
+  path_provider: ^2.1.5       # UNRESOLVED
+  uuid: ^4.6.0                # VERIFIED (4.6.0)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0       # UNRESOLVED
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/Mukta-Regular.ttf
+    - assets/fonts/Mukta-Bold.ttf

@@ -1,0 +1,72 @@
+# Builds the Android APK in the cloud (no Flutter needed on your PC).
+# STATUS: WRITTEN BUT NEVER RUN. Action versions are the commonly used major tags; if a step
+# fails, open the run's log and send it to whoever maintains this project.
+# Run it from GitHub: Actions tab -> "Build APK" -> Run workflow -> enter your https API domain.
+name: Build APK
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "Production API URL, https only, no trailing slash, no /api (e.g. https://your-project.vercel.app)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the API URL
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
+        run: |
+          case "$API_BASE_URL" in
+            https://*) ;;
+            *) echo "API URL must start with https://"; exit 1;;
+          esac
+          case "$API_BASE_URL" in
+            *YOUR-PRODUCTION-DOMAIN*|*/|*/api|*/api/) echo "Replace the placeholder / remove the trailing slash or /api"; exit 1;;
+          esac
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter --version
+
+      - name: Generate the Android project
+        run: ./scripts/bootstrap_android.sh
+
+      - run: flutter pub get
+
+      - name: Analyze (reported, does not block the build)
+        continue-on-error: true
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release APK
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url }}
+        run: flutter build apk --release --dart-define=API_BASE_URL="$API_BASE_URL"
+
+      - name: Fingerprint
+        run: sha256sum build/app/outputs/flutter-apk/app-release.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ganpati-mandal-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
