@@ -46,7 +46,7 @@ jobs:
       - run: flutter --version
 
       - name: Generate the Android project
-        run: ./scripts/bootstrap_android.sh
+        run: bash scripts/bootstrap_android.sh
 
       - run: flutter pub get
 
