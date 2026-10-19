@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/features/reports/report_button.dart';
 import 'package:ganpati_mandal/models/app_enums.dart';
 
@@ -16,12 +17,8 @@ class ReportsHubScreen extends ConsumerWidget {
     Widget tile(ReportKind kind, Fund fund, String titleKey, String subtitleKey) {
       final color = FundColors.of(fund);
       return Card(
-        margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
         child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: color.withValues(alpha: 0.15),
-            child: Icon(FundColors.iconOf(fund), color: color),
-          ),
+          leading: IconBadge(icon: FundColors.iconOf(fund), color: color),
           title: Text(l.t(titleKey)),
           subtitle: Text(l.t(subtitleKey)),
           trailing: const Icon(Icons.chevron_right),
@@ -33,7 +30,7 @@ class ReportsHubScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.t('reports'))),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           tile(ReportKind.household, Fund.householdDonation, 'report_household', 'report_household_desc'),
           tile(ReportKind.commonFund, Fund.commonMandal, 'report_common', 'report_common_desc'),

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/confirm_dialog.dart';
 import 'package:ganpati_mandal/domain/permissions.dart';
 import 'package:ganpati_mandal/features/audit/audit_screen.dart';
+import 'package:ganpati_mandal/features/profile/profile_screen.dart';
 import 'package:ganpati_mandal/features/settings/settings_screen.dart';
 import 'package:ganpati_mandal/features/users/users_screen.dart';
 
-enum _MenuAction { language, users, settings, audit, logout }
+enum _MenuAction { profile, language, users, settings, audit, logout }
 
 /// Overflow menu shown on every top-level screen: language, admin tools, logout.
 class AppMenuButton extends ConsumerWidget {
@@ -31,6 +33,10 @@ class AppMenuButton extends ConsumerWidget {
       tooltip: l.t('menu'),
       onSelected: (action) async {
         switch (action) {
+          case _MenuAction.profile:
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const ProfileScreen()),
+            );
           case _MenuAction.language:
             ref.read(languageProvider.notifier).state = l.isMarathi ? 'en' : 'mr';
           case _MenuAction.users:
@@ -59,12 +65,24 @@ class AppMenuButton extends ConsumerWidget {
       },
       itemBuilder: (_) => [
         PopupMenuItem<_MenuAction>(
-          enabled: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          value: _MenuAction.profile,
+          child: Row(
             children: [
-              Text(actor?.name ?? '', style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(l.role(role), style: const TextStyle(fontSize: 12)),
+              InitialsAvatar(name: actor?.name ?? '', radius: 18),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      actor?.name ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    Text(l.role(role), style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

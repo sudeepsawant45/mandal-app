@@ -4,7 +4,6 @@ import 'package:ganpati_mandal/core/errors/app_exception.dart';
 import 'package:ganpati_mandal/core/errors/error_text.dart';
 import 'package:ganpati_mandal/core/l10n/l10n.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
-import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
 import 'package:ganpati_mandal/core/widgets/form_fields.dart';
 import 'package:ganpati_mandal/core/widgets/state_views.dart';
@@ -74,20 +73,6 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         return 'report_visarjan_combined';
       case ReportKind.tshirt:
         return 'report_tshirt';
-    }
-  }
-
-  Fund get _fund {
-    switch (widget.kind) {
-      case ReportKind.household:
-        return Fund.householdDonation;
-      case ReportKind.commonFund:
-        return Fund.commonMandal;
-      case ReportKind.visarjanGroup:
-      case ReportKind.visarjanCombined:
-        return Fund.visarjan;
-      case ReportKind.tshirt:
-        return Fund.tshirtSponsorship;
     }
   }
 
@@ -236,7 +221,6 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   Widget build(BuildContext context) {
     final l = ref.watch(l10nProvider);
     final role = ref.watch(roleProvider);
-    final color = FundColors.of(_fund);
 
     final entriesAv = ref.watch(allEntriesProvider);
     final settingsAv = ref.watch(settingsProvider);
@@ -272,7 +256,6 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l.t(_titleKey)),
-        backgroundColor: color.withValues(alpha: 0.15),
       ),
       body: body,
     );

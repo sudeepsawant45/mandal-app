@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 
 class SummaryLine {
-  const SummaryLine(this.label, this.paise, {this.emphasize = false, this.signColored = false});
+  const SummaryLine(
+    this.label,
+    this.paise, {
+    this.emphasize = false,
+    this.signColored = false,
+    this.tone,
+  });
 
   final String label;
   final int paise;
   final bool emphasize;
+
+  /// Optional fixed colour for the amount (green income, red expense, blue balance).
+  final Color? tone;
 
   /// Colours the value red when negative (used for balances).
   final bool signColored;
@@ -41,42 +51,42 @@ class FundSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(left: BorderSide(color: color, width: 5)),
-        ),
-        padding: const EdgeInsets.fromLTRB(14, 12, 8, 6),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 10, 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: color),
-                const SizedBox(width: 8),
+                IconBadge(icon: icon, color: color, size: 40),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     title,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             for (final line in lines)
               Padding(
-                padding: const EdgeInsets.only(right: 6, bottom: 2),
+                padding: const EdgeInsets.only(right: 6, bottom: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(line.label),
+                    Expanded(child: Text(line.label)),
                     Text(
                       Money.format(line.paise),
                       style: TextStyle(
-                        fontWeight: line.emphasize ? FontWeight.bold : FontWeight.normal,
-                        color: line.signColored && line.paise < 0 ? FundColors.expense : null,
+                        fontWeight: line.emphasize ? FontWeight.bold : FontWeight.w500,
+                        fontSize: line.emphasize ? 16 : 14,
+                        color: line.signColored && line.paise < 0
+                            ? FundColors.expense
+                            : (line.tone ?? (line.emphasize ? color : null)),
                       ),
                     ),
                   ],
@@ -119,7 +129,7 @@ class SummaryStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = color ?? Theme.of(context).colorScheme.primary;
     return Card(
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -152,7 +162,7 @@ class SummaryStrip extends StatelessWidget {
                             fontWeight: item.emphasize ? FontWeight.bold : FontWeight.w600,
                             color: item.signColored && item.paise < 0
                                 ? FundColors.expense
-                                : (item.emphasize ? accent : null),
+                                : (item.tone ?? (item.emphasize ? accent : null)),
                           ),
                         ),
                       ],

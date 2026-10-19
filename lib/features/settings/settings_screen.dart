@@ -105,7 +105,7 @@ class _SettingsFormState extends ConsumerState<_SettingsForm> {
             ),
             validator: (v) => (v ?? '').trim().isEmpty ? l.t('v_required') : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: _saving ? null : _save,
             icon: _saving

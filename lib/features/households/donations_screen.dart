@@ -4,6 +4,7 @@ import 'package:ganpati_mandal/core/providers/app_providers.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/date_utils.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/entity_dialog.dart';
 import 'package:ganpati_mandal/core/widgets/form_fields.dart';
 import 'package:ganpati_mandal/core/widgets/fund_summary_card.dart';
@@ -30,14 +31,12 @@ class DonationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = ref.watch(l10nProvider);
     final role = ref.watch(roleProvider);
-    final color = FundColors.of(Fund.householdDonation);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.t('household_donations')),
-          backgroundColor: color.withValues(alpha: 0.15),
           actions: const [
             ReportButton(kind: ReportKind.household),
             AppMenuButton(),
@@ -172,8 +171,12 @@ class _HouseholdsTabState extends ConsumerState<_HouseholdsTab> {
                 )
               else
                 for (final s in summaries)
-                  ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.home_outlined)),
+                  Card(
+                    child: ListTile(
+                    leading: IconBadge(
+                      icon: Icons.home_outlined,
+                      color: FundColors.of(Fund.householdDonation),
+                    ),
                     title: Text(
                       s.household.name,
                       style: s.household.active
@@ -195,6 +198,7 @@ class _HouseholdsTabState extends ConsumerState<_HouseholdsTab> {
                       MaterialPageRoute<void>(
                         builder: (_) => HouseholdDetailScreen(householdId: s.household.id),
                       ),
+                    ),
                     ),
                   ),
             ],

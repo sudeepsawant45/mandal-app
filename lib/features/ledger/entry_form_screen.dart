@@ -318,7 +318,6 @@ class _EntryFormScreenState extends ConsumerState<EntryFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEdit ? l.t('edit_entry') : l.t('add_entry')),
-        backgroundColor: color.withValues(alpha: 0.15),
       ),
       body: Form(
         key: _formKey,

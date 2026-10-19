@@ -30,7 +30,6 @@ class MandalFundScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l.t('common_fund')),
-        backgroundColor: color.withValues(alpha: 0.15),
         actions: const [
           ReportButton(kind: ReportKind.commonFund),
           AppMenuButton(),

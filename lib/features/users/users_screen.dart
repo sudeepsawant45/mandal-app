@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/errors/error_text.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/theme/app_theme.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/confirm_dialog.dart';
 import 'package:ganpati_mandal/core/widgets/state_views.dart';
 import 'package:ganpati_mandal/models/app_enums.dart';
@@ -168,43 +170,74 @@ class UsersScreen extends ConsumerWidget {
         value: users,
         builder: (list) {
           if (list.isEmpty) return EmptyState(message: l.t('no_users'));
-          return ListView.separated(
+          return ListView.builder(
+            padding: const EdgeInsets.only(top: 8, bottom: 96),
             itemCount: list.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, i) {
               final u = list[i];
               final isMe = me != null && u.uid == me.uid;
               final inactive = !u.active;
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Icon(inactive ? Icons.block : Icons.person_outline),
-                ),
-                title: Text(u.label),
-                subtitle: Text(inactive ? '${u.email}\n${l.t('inactive')}' : u.email),
-                isThreeLine: inactive,
-                trailing: isMe
-                    ? Text(l.role(u.role))
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          DropdownButton<AppRole>(
-                            value: _assignableRoles.contains(u.role) ? u.role : null,
-                            underline: const SizedBox.shrink(),
-                            items: [
-                              for (final r in _assignableRoles)
-                                DropdownMenuItem<AppRole>(value: r, child: Text(l.role(r))),
-                            ],
-                            onChanged: (r) {
-                              if (r != null) _changeRole(context, ref, u, r);
-                            },
-                          ),
-                          IconButton(
-                            tooltip: l.t(inactive ? 'activate_title' : 'deactivate_title'),
-                            icon: Icon(inactive ? Icons.check_circle_outline : Icons.block),
-                            onPressed: () => _toggleActive(context, ref, u),
-                          ),
-                        ],
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+                  child: Row(
+                    children: [
+                      InitialsAvatar(name: u.label, inactive: inactive),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              u.label,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                            ),
+                            Text(
+                              u.email,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: [
+                                RoleBadge(role: u.role, l10n: l),
+                                if (inactive)
+                                  StatusPill(label: l.t('inactive'), color: FundColors.expense),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
+                      if (!isMe)
+                        PopupMenuButton<Object>(
+                          tooltip: l.t('menu'),
+                          onSelected: (v) {
+                            if (v is AppRole) {
+                              _changeRole(context, ref, u, v);
+                            } else {
+                              _toggleActive(context, ref, u);
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            for (final r in _assignableRoles)
+                              CheckedPopupMenuItem<Object>(
+                                value: r,
+                                checked: r == u.role,
+                                child: Text(l.role(r)),
+                              ),
+                            const PopupMenuDivider(),
+                            PopupMenuItem<Object>(
+                              value: 'toggle',
+                              child: Text(l.t(inactive ? 'activate_title' : 'deactivate_title')),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
               );
             },
           );

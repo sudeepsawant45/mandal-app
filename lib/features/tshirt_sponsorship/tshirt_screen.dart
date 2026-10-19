@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/entity_dialog.dart';
 import 'package:ganpati_mandal/core/widgets/form_fields.dart';
 import 'package:ganpati_mandal/core/widgets/fund_summary_card.dart';
@@ -29,14 +30,12 @@ class TshirtScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = ref.watch(l10nProvider);
     final role = ref.watch(roleProvider);
-    final color = FundColors.of(Fund.tshirtSponsorship);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.t('tshirt')),
-          backgroundColor: color.withValues(alpha: 0.15),
           actions: const [
             ReportButton(kind: ReportKind.tshirt),
             AppMenuButton(),
@@ -207,10 +206,7 @@ class _SponsorsTabState extends ConsumerState<_SponsorsTab> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Text(l.t('sponsor_wise'), style: Theme.of(context).textTheme.titleSmall),
-              ),
+              SectionHeader(l.t('sponsor_wise')),
               if (perSponsor.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 32),
@@ -218,8 +214,12 @@ class _SponsorsTabState extends ConsumerState<_SponsorsTab> {
                 )
               else
                 for (final s in perSponsor)
-                  ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+                  Card(
+                    child: ListTile(
+                    leading: IconBadge(
+                      icon: Icons.person_outline,
+                      color: FundColors.of(Fund.tshirtSponsorship),
+                    ),
                     title: Text(
                       s.sponsor.name,
                       style: s.sponsor.active
@@ -237,6 +237,7 @@ class _SponsorsTabState extends ConsumerState<_SponsorsTab> {
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     onTap: () => _openSponsor(s.sponsor, ss),
+                    ),
                   ),
             ],
           );

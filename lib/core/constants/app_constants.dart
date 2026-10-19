@@ -22,6 +22,9 @@ class AppConstants {
   static const fontRegularAsset = 'assets/fonts/Mukta-Regular.ttf';
   static const fontBoldAsset = 'assets/fonts/Mukta-Bold.ttf';
 
+  /// Shown on the profile screen. Keep in sync with `version:` in pubspec.yaml.
+  static const appVersion = '1.0.0';
+
   /// Number of recent transactions shown on the dashboard.
   static const recentCount = 10;
 }

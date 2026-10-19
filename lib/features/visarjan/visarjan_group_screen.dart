@@ -42,7 +42,6 @@ class VisarjanGroupScreen extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(group.name),
-            backgroundColor: color.withValues(alpha: 0.15),
             actions: [
               ReportButton(kind: ReportKind.visarjanGroup, groupId: group.id),
               if (Permissions.canManageGroupsAndSponsors(role))

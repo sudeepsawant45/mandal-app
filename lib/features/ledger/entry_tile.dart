@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ganpati_mandal/core/l10n/l10n.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/features/ledger/ledger_labels.dart';
 import 'package:ganpati_mandal/models/ledger_entry.dart';
 
@@ -31,29 +32,36 @@ class EntryTile extends StatelessWidget {
       decoration: deleted ? TextDecoration.lineThrough : null,
       color: deleted ? Theme.of(context).colorScheme.outline : null,
     );
-    return ListTile(
-      onTap: onTap,
-      leading: CircleAvatar(
-        backgroundColor: color.withValues(alpha: 0.12),
-        child: Icon(
-          entry.isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+    return Card(
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        onTap: onTap,
+        leading: IconBadge(
+          icon: entry.isIncome ? Icons.arrow_downward : Icons.arrow_upward,
           color: color,
-          size: 20,
+          size: 40,
         ),
-      ),
-      title: Text(entryTitle(l10n, entry), style: titleStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(
-        entrySubtitle(l10n, entry, includeFund: includeFund) +
-            (deleted ? ' • ${l10n.t('deleted')}' : ''),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: Text(
-        '$sign${Money.format(entry.amountPaise)}',
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          decoration: deleted ? TextDecoration.lineThrough : null,
+        title: Text(
+          entryTitle(l10n, entry),
+          style: titleStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          entrySubtitle(l10n, entry, includeFund: includeFund) +
+              (deleted ? ' • ${l10n.t('deleted')}' : ''),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Text(
+          '$sign${Money.format(entry.amountPaise)}',
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
+            decoration: deleted ? TextDecoration.lineThrough : null,
+          ),
         ),
       ),
     );

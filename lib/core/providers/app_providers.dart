@@ -114,6 +114,9 @@ final actorProvider = Provider<Actor?>((ref) {
 final roleProvider =
     Provider<AppRole>((ref) => ref.watch(actorProvider)?.role ?? AppRole.pending);
 
+/// The welcome screen is shown once per app launch before the login screen.
+final welcomeDismissedProvider = StateProvider<bool>((ref) => false);
+
 // ---------------------------------------------------------------- navigation
 final homeTabProvider = StateProvider<int>((ref) => 0);
 

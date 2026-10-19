@@ -43,7 +43,6 @@ class HouseholdDetailScreen extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(household.name),
-            backgroundColor: color.withValues(alpha: 0.15),
             actions: [
               if (Permissions.canManageHouseholds(role))
                 IconButton(

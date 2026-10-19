@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/errors/error_text.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/theme/app_theme.dart';
 
 class LoadingState extends StatelessWidget {
   const LoadingState({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const Center(child: CircularProgressIndicator());
+  Widget build(BuildContext context) => const Center(
+        child: CircularProgressIndicator(color: AppTheme.royalBlue),
+      );
 }
 
 class EmptyState extends StatelessWidget {
@@ -26,9 +28,14 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: color),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center, style: TextStyle(color: color)),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: const BoxDecoration(color: AppTheme.paleBlue, shape: BoxShape.circle),
+              child: Icon(icon, size: 40, color: AppTheme.royalBlue.withValues(alpha: 0.7)),
+            ),
+            const SizedBox(height: 14),
+            Text(message, textAlign: TextAlign.center, style: TextStyle(color: color, fontSize: 15)),
           ],
         ),
       ),
@@ -51,8 +58,16 @@ class ErrorState extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: 12),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.errorContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.error_outline, size: 40, color: Theme.of(context).colorScheme.error),
+            ),
+            const SizedBox(height: 14),
             Text(describeError(l, error), textAlign: TextAlign.center),
             if (onRetry != null) ...[
               const SizedBox(height: 16),

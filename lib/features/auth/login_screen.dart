@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/errors/error_text.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/theme/app_theme.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
+import 'package:ganpati_mandal/core/widgets/otp_code_field.dart';
 
 /// Email-OTP login. Step 1: enter the email -> the backend emails a 6-digit
 /// code (only if an admin approved this address; the reply is identical either
@@ -111,113 +113,175 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l = ref.watch(l10nProvider);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () => ref.read(languageProvider.notifier).state =
-                          l.isMarathi ? 'en' : 'mr',
-                      child: Text(l.isMarathi ? 'English' : 'मराठी'),
-                    ),
-                  ),
-                  Icon(Icons.account_balance_outlined, size: 56, color: scheme.primary),
-                  const SizedBox(height: 8),
-                  Text(
-                    l.t('app_name'),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(l.t('sign_in'), textAlign: TextAlign.center),
-                  const SizedBox(height: 24),
-                  if (!_codeSent)
-                    Form(
-                      key: _emailKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextFormField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const [AutofillHints.email],
-                            textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => _sendCode(),
-                            decoration: InputDecoration(labelText: l.t('email')),
-                            validator: (v) => _emailPattern.hasMatch((v ?? '').trim())
-                                ? null
-                                : l.t('v_email_invalid'),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(l.t('otp_members_only'), style: Theme.of(context).textTheme.bodySmall),
-                        ],
-                      ),
-                    )
-                  else
-                    Form(
-                      key: _codeKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            '${l.t('otp_sent_hint')}\n${_email.text.trim()}',
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _code,
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            maxLength: 6,
-                            autofillHints: const [AutofillHints.oneTimeCode],
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                            style: const TextStyle(fontSize: 24, letterSpacing: 8),
-                            decoration: InputDecoration(labelText: l.t('otp_code'), counterText: ''),
-                            onFieldSubmitted: (_) => _verify(),
-                            validator: (v) =>
-                                RegExp(r'^\d{6}$').hasMatch((v ?? '').trim()) ? null : l.t('v_otp_invalid'),
-                          ),
-                        ],
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppTheme.royalBlue, AppTheme.blue],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        style: TextButton.styleFrom(foregroundColor: Colors.white),
+                        onPressed: () => ref.read(languageProvider.notifier).state =
+                            l.isMarathi ? 'en' : 'mr',
+                        child: Text(l.isMarathi ? 'English' : 'मराठी'),
                       ),
                     ),
-                  if (_error != null) ...[
+                    const Center(child: BrandMark(size: 84, onDark: true)),
                     const SizedBox(height: 12),
-                    Text(_error!, style: TextStyle(color: scheme.error)),
-                  ],
-                  const SizedBox(height: 20),
-                  FilledButton(
-                    onPressed: _busy ? null : (_codeSent ? _verify : _sendCode),
-                    child: _busy
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(_codeSent ? l.t('otp_verify') : l.t('otp_send')),
-                  ),
-                  if (_codeSent) ...[
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: (_busy || _cooldown > 0) ? null : _sendCode,
-                      child: Text(
-                        _cooldown > 0
-                            ? '${l.t('otp_resend_in')} $_cooldown ${l.t('seconds_short')}'
-                            : l.t('otp_resend'),
+                    Text(
+                      l.t('app_name'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    TextButton(
-                      onPressed: _busy ? null : _changeEmail,
-                      child: Text(l.t('otp_change_email')),
+                    const SizedBox(height: 20),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              _codeSent ? l.t('otp_enter_title') : l.t('sign_in'),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.textDark,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            if (!_codeSent)
+                              Form(
+                                key: _emailKey,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    TextFormField(
+                                      controller: _email,
+                                      keyboardType: TextInputType.emailAddress,
+                                      autofillHints: const [AutofillHints.email],
+                                      textInputAction: TextInputAction.done,
+                                      enabled: !_busy,
+                                      onFieldSubmitted: (_) => _sendCode(),
+                                      decoration: InputDecoration(
+                                        labelText: l.t('email'),
+                                        prefixIcon: const Icon(Icons.mail_outline),
+                                      ),
+                                      validator: (v) => _emailPattern.hasMatch((v ?? '').trim())
+                                          ? null
+                                          : l.t('v_email_invalid'),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      l.t('otp_members_only'),
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else
+                              Form(
+                                key: _codeKey,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      '${l.t('otp_sent_hint')}\n${_email.text.trim()}',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    OtpCodeField(
+                                      controller: _code,
+                                      enabled: !_busy,
+                                      hasError: _error != null,
+                                      validator: (v) => RegExp(r'^\d{6}$').hasMatch((v ?? '').trim())
+                                          ? null
+                                          : l.t('v_otp_invalid'),
+                                      onChanged: (_) {
+                                        if (_error != null) setState(() => _error = null);
+                                      },
+                                      onCompleted: (_) => _verify(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_error != null) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: scheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.error_outline, size: 18, color: scheme.error),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _error!,
+                                        style: TextStyle(color: scheme.onErrorContainer),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: 18),
+                            FilledButton(
+                              onPressed: _busy ? null : (_codeSent ? _verify : _sendCode),
+                              child: _busy
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.4,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(_codeSent ? l.t('otp_verify') : l.t('otp_send')),
+                            ),
+                            if (_codeSent) ...[
+                              const SizedBox(height: 6),
+                              TextButton(
+                                onPressed: (_busy || _cooldown > 0) ? null : _sendCode,
+                                child: Text(
+                                  _cooldown > 0
+                                      ? '${l.t('otp_resend_in')} $_cooldown ${l.t('seconds_short')}'
+                                      : l.t('otp_resend'),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: _busy ? null : _changeEmail,
+                                child: Text(l.t('otp_change_email')),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ],
-                ],
+                ),
               ),
             ),
           ),

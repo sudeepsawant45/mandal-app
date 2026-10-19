@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/theme/app_theme.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/state_views.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: LoadingState());
+  Widget build(BuildContext context) => const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BrandMark(size: 96),
+              SizedBox(height: 28),
+              SizedBox(width: 160, child: LinearProgressIndicator(color: AppTheme.royalBlue)),
+            ],
+          ),
+        ),
+      );
 }
 
 /// The saved session could not be checked (usually: no network). The session

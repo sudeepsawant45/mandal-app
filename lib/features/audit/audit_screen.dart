@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
+import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/date_utils.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/state_views.dart';
 import 'package:ganpati_mandal/models/audit_entry.dart';
 
@@ -36,16 +38,18 @@ class AuditScreen extends ConsumerWidget {
         value: audit,
         builder: (list) {
           if (list.isEmpty) return EmptyState(message: l.t('no_audit'), icon: Icons.history);
-          return ListView.separated(
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: list.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, i) {
               final a = list[i];
-              return ListTile(
-                leading: Icon(_icon(a.action)),
-                title: Text(a.summary, maxLines: 2, overflow: TextOverflow.ellipsis),
-                subtitle: Text(
-                  '${a.userName} • ${a.at == null ? '' : formatDateTime(a.at!)}',
+              return Card(
+                child: ListTile(
+                  leading: IconBadge(icon: _icon(a.action), color: AppTheme.royalBlue, size: 40),
+                  title: Text(a.summary, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(
+                    '${a.userName} • ${a.at == null ? '' : formatDateTime(a.at!)}',
+                  ),
                 ),
               );
             },

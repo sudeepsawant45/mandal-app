@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ganpati_mandal/core/providers/app_providers.dart';
 import 'package:ganpati_mandal/core/theme/app_theme.dart';
 import 'package:ganpati_mandal/core/utils/money.dart';
+import 'package:ganpati_mandal/core/widgets/brand_widgets.dart';
 import 'package:ganpati_mandal/core/widgets/entity_dialog.dart';
 import 'package:ganpati_mandal/core/widgets/form_fields.dart';
 import 'package:ganpati_mandal/core/widgets/fund_summary_card.dart';
@@ -30,14 +31,12 @@ class VisarjanScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = ref.watch(l10nProvider);
     final role = ref.watch(roleProvider);
-    final color = FundColors.of(Fund.visarjan);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.t('visarjan')),
-          backgroundColor: color.withValues(alpha: 0.15),
           actions: const [
             // Combined report for all visarjan groups; the individual group
             // report is on each group's own screen.
@@ -166,10 +165,7 @@ class _GroupsTabState extends ConsumerState<_GroupsTab> {
                   Card(
                     margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: color.withValues(alpha: 0.15),
-                        child: Icon(Icons.water_drop_outlined, color: color),
-                      ),
+                      leading: IconBadge(icon: Icons.water_drop_outlined, color: color),
                       title: Text(
                         s.group.name,
                         style: s.group.active
